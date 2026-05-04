@@ -3,10 +3,15 @@ pipeline {
 
     stages {
 
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
         stage('Encrypt Code') {
             steps {
                 bat '''
-                IF EXIST encrypted (rmdir /s /q encrypted)
                 mkdir encrypted
 
                 php obfuscate.php -i . -o encrypted --skip encrypted,node_modules,.git
@@ -20,19 +25,22 @@ pipeline {
 
         stage('Push to Encrypted Branch') {
             steps {
-                bat '''
-                git config user.name "jenkins"
-                git config user.email "jenkins@gmail.com"
+                withCredentials([usernamePassword(credentialsId: 'github_creds', usernameVariable: 'USER', passwordVariable: 'TOKEN')]) {
+                    bat '''
+                    git config user.name "jenkins"
+                    git config user.email "jenkins@gmail.com"
 
-                git checkout -B encrypted origin/master
+                    git init
+                    git checkout -B encrypted
 
-                git add encrypted
-                git diff --quiet || git commit -m "Encrypted code"
+                    git add encrypted
+                    git commit -m "Encrypted code" || echo No changes
 
-                git remote set-url origin https://github.com/vanshikapandit-cyber/Jenkins-project.git
+                    git remote add origin https://%USER%:%TOKEN%@github.com/vanshikapandit-cyber/Jenkins-project.git
 
-                git push origin encrypted --force
-                '''
+                    git push origin encrypted --force --verbose
+                    '''
+                }
             }
         }
 
