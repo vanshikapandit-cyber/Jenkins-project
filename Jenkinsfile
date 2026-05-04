@@ -3,9 +3,17 @@ pipeline {
 
     stages {
 
-        stage('Clean Workspace') {
+        stage('Checkout') {
             steps {
-                cleanWs()
+                git url: 'https://github.com/vanshikapandit-cyber/Jenkins-project.git'
+            }
+        }
+
+        stage('Clean Encrypted Folder Only') {
+            steps {
+                bat '''
+                IF EXIST encrypted (rmdir /s /q encrypted)
+                '''
             }
         }
 
@@ -30,14 +38,12 @@ pipeline {
                     git config user.name "jenkins"
                     git config user.email "jenkins@gmail.com"
 
-                    git init
                     git checkout -B encrypted
 
                     git add encrypted
                     git commit -m "Encrypted code" || echo No changes
 
-                    git remote add origin https://%USER%:%TOKEN%@github.com/vanshikapandit-cyber/Jenkins-project.git
-
+                    git remote set-url origin https://%USER%:%TOKEN%@github.com/vanshikapandit-cyber/Jenkins-project.git
                     git push origin encrypted --force --verbose
                     '''
                 }
