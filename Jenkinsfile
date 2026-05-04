@@ -31,21 +31,22 @@ pipeline {
             }
         }
 
-       stage('Push to Encrypted Branch') {
+  stage('Push to Encrypted Branch') {
     steps {
         withCredentials([usernamePassword(credentialsId: 'github_creds', usernameVariable: 'USER', passwordVariable: 'TOKEN')]) {
             bat '''
             git config user.name "jenkins"
             git config user.email "jenkins@gmail.com"
 
-            git checkout -B encrypted origin/master
+            git checkout -B encrypted
 
             git add encrypted
-            git commit -m "Encrypted code" || echo No changes
 
-            git remote set-url origin https://github.com/vanshikapandit-cyber/Jenkins-project.git
+            git diff --cached --quiet && echo "No changes to commit" || git commit -m "Encrypted code"
 
-            git push origin encrypted --force --verbose
+            git remote set-url origin https://%USER%:%TOKEN%@github.com/vanshikapandit-cyber/Jenkins-project.git
+
+            timeout 120 git push origin encrypted --force --verbose
             '''
         }
     }
