@@ -43,8 +43,7 @@ pipeline {
                     git add encrypted
                     git commit -m "Encrypted code" || echo No changes
 
-                    git remote set-url origin https://%USER%:%TOKEN%@github.com/vanshikapandit-cyber/Jenkins-project.git
-                    git push origin encrypted --force --verbose
+                  git push https://%USER%:%TOKEN%@github.com/vanshikapandit-cyber/Jenkins-project.git encrypted --force --verbose
                     '''
                 }
             }
