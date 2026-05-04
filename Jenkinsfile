@@ -29,7 +29,7 @@ pipeline {
 
         stage('Push to Encrypted Branch') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'USER', passwordVariable: 'TOKEN')]) {
+                withCredentials([usernamePassword(credentialsId: 'github_creds', usernameVariable: 'USER', passwordVariable: 'TOKEN')]) {
                     bat '''
                     git config user.name "jenkins"
                     git config user.email "jenkins@gmail.com"
