@@ -13,14 +13,16 @@ pipeline {
 
         stage('Encrypt Code') {
             steps {
-                sh '''
-                rm -rf encrypted
+                bat '''
+                rmdir /s /q encrypted
                 mkdir encrypted
 
-                php tools/obfuscate.php -i . -o encrypted --skip encrypted,node_modules,.git
+                php obfuscate.php -i . -o encrypted
 
-                # Optional extra JS encryption
-                find encrypted -type f -name "*.js" -exec sed -i 's/console.log/ENC_LOG/g' {} \\;
+                REM Example encryption
+                for /r encrypted %%f in (*.js) do (
+                    powershell -Command "(Get-Content %%f) -replace 'console.log','ENC_LOG' | Set-Content %%f"
+                )
                 '''
             }
         }
@@ -28,15 +30,15 @@ pipeline {
         stage('Push to Encrypted Branch') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'USER', passwordVariable: 'TOKEN')]) {
-                    sh '''
+                    bat '''
                     git config user.name "jenkins"
                     git config user.email "jenkins@gmail.com"
 
                     git checkout -B encrypted
                     git add .
-                    git commit -m "Encrypted code" || echo "No changes"
+                    git commit -m "Encrypted code" || echo No changes
 
-                    git push https://$USER:$TOKEN@github.com/vanshikapandit-cyber/Jenkins-project.git encrypted --force
+                    git push https://%USER%:%TOKEN%@github.com/vanshikapandit-cyber/Jenkins-project.git encrypted --force
                     '''
                 }
             }
