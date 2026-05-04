@@ -11,7 +11,6 @@ pipeline {
 
                 php obfuscate.php -i . -o encrypted --skip encrypted,node_modules,.git
 
-                REM Replace console.log
                 for /R encrypted %%f in (*.js) do (
                     powershell -Command "(Get-Content %%f) -replace 'console.log','ENC_LOG' | Set-Content %%f"
                 )
