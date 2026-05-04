@@ -19,22 +19,22 @@ pipeline {
         }
 
         stage('Push to Encrypted Branch') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'github_creds', usernameVariable: 'USER', passwordVariable: 'TOKEN')]) {
-                    bat '''
-                    git config user.name "jenkins"
-                    git config user.email "jenkins@gmail.com"
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'github_creds', usernameVariable: 'USER', passwordVariable: 'TOKEN')]) {
+            bat '''
+            git config user.name "jenkins"
+            git config user.email "jenkins@gmail.com"
 
-                    git checkout -B encrypted
+            git checkout -B encrypted
 
-                    git add encrypted
-                    git commit -m "Encrypted code" || echo No changes
+            git add encrypted
+            git diff --quiet || git commit -m "Encrypted code"
 
-                    git remote set-url origin https://%USER%:%TOKEN%@github.com/vanshikapandit-cyber/Jenkins-project.git
-                    git push origin encrypted --force
-                    '''
-                }
-            }
+            git push https://%USER%:%TOKEN%@github.com/vanshikapandit-cyber/Jenkins-project.git encrypted --force
+            '''
         }
+    }
+    }
+    
     }
 }
