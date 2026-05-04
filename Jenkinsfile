@@ -33,7 +33,7 @@ pipeline {
 
     stage('Push to Encrypted Branch') {
     steps {
-        withCredentials([usernamePassword(credentialsId: 'github_creds', usernameVariable: 'USER', passwordVariable: 'TOKEN')]) {
+        withCredentials([usernamePassword(credentialsId: 'github_creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
             bat '''
             git config user.name "jenkins"
             git config user.email "jenkins@gmail.com"
@@ -43,7 +43,7 @@ pipeline {
             git add encrypted
             git commit -m "Encrypted code" || echo No changes
 
-            git push https://%USER%:%TOKEN%@github.com/vanshikapandit-cyber/Jenkins-project.git encrypted --force --verbose
+            git push https://%GIT_USER%:%GIT_TOKEN%@github.com/vanshikapandit-cyber/Jenkins-project.git encrypted --force --verbose
             '''
         }
     }
