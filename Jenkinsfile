@@ -31,7 +31,6 @@ pipeline {
             }
         }
 
-stage('Push to Encrypted Branch') {
     stage('Push to Encrypted Branch') {
     steps {
         withCredentials([usernamePassword(credentialsId: 'github_creds', usernameVariable: 'USER', passwordVariable: 'TOKEN')]) {
@@ -48,7 +47,7 @@ stage('Push to Encrypted Branch') {
             '''
         }
     }
-}
+   }
 
     }
 }
