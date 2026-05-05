@@ -22,11 +22,9 @@ pipeline {
                 bat '''
                 mkdir encrypted
 
-                php obfuscate.php -i . -o encrypted --skip encrypted,node_modules,.git
+                powershell -Command "Get-ChildItem -Recurse -Filter *.js | Where-Object { $_.FullName -notmatch '\\\\node_modules\\\\' -and $_.FullName -notmatch '\\\\encrypted\\\\' } | ForEach-Object { (Get-Content $_.FullName) -replace 'console.log', 'ENC_LOG' | Set-Content $_.FullName }"
 
-                for /R encrypted %%f in (*.js) do (
-                    powershell -Command "(Get-Content %%f) -replace 'console.log','ENC_LOG' | Set-Content %%f"
-                )
+                php obfuscate.php -i . -o encrypted --skip encrypted,node_modules,.git
                 '''
             }
         }
@@ -43,7 +41,7 @@ pipeline {
             git add encrypted
             git commit -m "Encrypted code" || echo No changes
 
-            git push https://%GIT_USER%:%GIT_TOKEN%@github.com/vanshikapandit-cyber/Jenkins-project.git encrypted --force --verbose
+            git push "https://%GIT_TOKEN%@github.com/vanshikapandit-cyber/Jenkins-project.git" encrypted --force --verbose
             '''
         }
     }
